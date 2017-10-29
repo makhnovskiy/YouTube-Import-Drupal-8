@@ -1,0 +1,6 @@
+youtube_import.config:
+  title: YouTube Import
+  route_name: youtube_import.config
+  parent: system.admin_config_system
+  description: 'Modification to Configs for YouTube Import Module'
+  weight: -20

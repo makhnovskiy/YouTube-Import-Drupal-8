@@ -78,6 +78,45 @@ function youtube_import_help($path, $arg) {
 /**
  * Implements hook_menu().
  */
+
+function youtube_import_menu() {
+  //$items['admin/config/system/smtp'] = array(
+
+
+  $items['admin/content/youtube-import'] = array(
+    'title' => 'YouTube Import',
+    'description' => 'Allow for site emails to be sent through an SMTP server of your choice.',
+    'route_name' => 'youtube-import.config',
+  );
+  return $items;
+
+
+/*
+  $items = array();
+
+  $items['admin/content/youtube-import'] = array(
+    'title' => 'YouTube Import',
+    'description' => 'Imports YouTube videos from a channel',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('youtube_import_form'),
+    'access arguments' => array('administer youtube_import'),
+    'file' => 'youtube_import.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
+  );
+
+  $items['admin/content/youtube-import/run-now'] = array(
+    'title' => 'Run Import',
+    'description' => 'Force the import to run now.',
+    'page callback' => 'youtube_import_run_now',
+    'access arguments' => array('administer youtube_import'),
+  );
+
+  return $items;
+  */
+}
+
+/*
 function youtube_import_menu() {
   $items = array();
 
@@ -101,6 +140,7 @@ function youtube_import_menu() {
 
   return $items;
 }
+*/
 
 /**
  * Implements hook_cron().

@@ -48,8 +48,6 @@ function youtube_import_schema() {
  */
 function youtube_import_requirements($phase) {
   $requirements = array();
-  //$t = get_t();
-  //$t = t();
 
   if ($phase == 'install' && !function_exists('curl_init')) {
     $requirements['CURL Enabled'] = array(
