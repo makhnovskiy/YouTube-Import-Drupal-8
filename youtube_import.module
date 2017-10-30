@@ -13,6 +13,7 @@
 /**
  * Implements hook_permissions().
  */
+/*
 function youtube_import_permission() {
   return array(
     'administer youtube_import' => array(
@@ -25,6 +26,7 @@ function youtube_import_permission() {
 /**
  * Implements hook_help().
  */
+/*
 function youtube_import_help($path, $arg) {
   switch ($path) {
     case 'admin/help#youtube_import':
@@ -79,10 +81,11 @@ function youtube_import_help($path, $arg) {
  * Implements hook_menu().
  */
 
+/*
 function youtube_import_menu() {
   //$items['admin/config/system/smtp'] = array(
 
-
+/*
   $items['admin/content/youtube-import'] = array(
     'title' => 'YouTube Import',
     'description' => 'Allow for site emails to be sent through an SMTP server of your choice.',
@@ -114,6 +117,7 @@ function youtube_import_menu() {
 
   return $items;
   */
+  /*
 }
 
 /*
