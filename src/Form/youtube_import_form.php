@@ -25,6 +25,10 @@ class youtube_import_form extends ConfigFormBase {
     
     $config = $this->configFactory->get('youtube_import.settings');
 
+    //pulling from settings.yml file
+    //$apikey = $drupal_user = $username = $playlistid = $frequency = $contenttype = $lastrun = '';
+
+
     /*
 
     if ($config->get('smtp_on')) {
@@ -35,11 +39,52 @@ class youtube_import_form extends ConfigFormBase {
     }
     drupal_set_message(t('Disabled fields are overridden in site-specific configuration file.'), 'warning');
 
-    $form['onoff'] = array(
-      '#type'  => 'details',
-      '#title' => t('Install options'),
-      '#open' => TRUE,
+    */
+
+    // Create the field for the API key.
+    $form['apikey'] = array(
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => t('YouTube API key.'),
+      '#default_value' => $config->get('apikey'),
     );
+
+    // Create the field for the username.
+  $form['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube user name or your channel ID'),
+    '#description' => t('This value is only used to get the playlist id. If you know the playlist id, you may leave this blank but be sure to fill in one or the other'),
+    '#default_value' => $config->get('username'),
+  );
+
+  // Create the field for the playlist id.
+  $form['playlistid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube play list ID.'),
+    '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+    '#default_value' => $config->get('playlistid'),
+  );
+
+  // Create the fequency setting.
+  $form['frequency'] = array(
+    '#type' => 'textfield',
+    '#required' => TRUE,
+    '#title' => t('Cron Frequency'),
+    '#description' => t('Enter 0 to disable the cron job. Enter the time in seconds to have it run during cron.'),
+    '#default_value' => $config->get('frequency'),
+  );
+
+  // Create the content type drop down.
+  $form['contenttype'] = array(
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#title' => t('Content Type'),
+    '#options' => node_type_get_names(),
+    '#default_value' => $config->get('contenttype'),
+    '#description' => t('Select the content type that videos should import to'),
+  );
+
+    /*
     $form['onoff']['smtp_on'] = array(
       '#type' => 'radios',
       '#title' => t('Turn this module on or off'),
