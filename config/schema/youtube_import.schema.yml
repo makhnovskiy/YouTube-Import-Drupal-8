@@ -1,7 +1,10 @@
-smtp.settings:
+youtube_import.settings:
   type: config_object
-  label: 'SMTP config.'
+  label: 'Youtube Import Configurations'
   mapping:
+    testing: 
+      type: text
+      label: 'testing label'
     smtp_on:
       type: boolean
       label: 'Turn this module on or off'

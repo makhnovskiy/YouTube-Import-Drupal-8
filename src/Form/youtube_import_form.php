@@ -4,6 +4,7 @@ namespace Drupal\youtube_import\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Implements the SMTP admin settings form.
@@ -14,15 +15,17 @@ class youtube_import_form extends ConfigFormBase {
    * {@inheritdoc}.
    */
   public function getFormID() {
-    return 'smtp_admin_settings';
+    return 'youtube_import_admin_settings';
   }
 
   /**
    * {@inheritdoc}.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    
+    $config = $this->configFactory->get('youtube_import.settings');
+
     /*
-    $config = $this->configFactory->get('smtp.settings');
 
     if ($config->get('smtp_on')) {
       drupal_set_message(t('SMTP module is active.'));
@@ -185,10 +188,11 @@ class youtube_import_form extends ConfigFormBase {
       '#description' => t('Checking this box will print SMTP messages from the server for every e-mail that is sent.'),
       '#disabled' => $this->isOverridden('smtp_debugging'),
     );
+    */
 
     return parent::buildForm($form, $form_state);
 
-    */
+    
   }
 
   /**
@@ -315,6 +319,10 @@ class youtube_import_form extends ConfigFormBase {
    *
    * @todo - Flesh this out.
    */
-  public function getEditableConfigNames() {}
+  public function getEditableConfigNames() {
+    return [
+      'youtube_import.settings',
+    ];
+  }
 
 }
