@@ -4,370 +4,388 @@ namespace Drupal\youtube_import\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+
+//not sure what this is used for, does not know if will work without- need to test
 use Symfony\Component\HttpFoundation\Request;
+
+//used for getting all users 
+use  \Drupal\user\Entity\User;
 
 /**
  * Implements the SMTP admin settings form.
  */
-class youtube_import_form extends ConfigFormBase {
+class youtube_import_form extends ConfigFormBase
+{
 
-  /**
-   * {@inheritdoc}.
-   */
-  public function getFormID() {
-    return 'youtube_import_admin_settings';
-  }
-
-  /**
-   * {@inheritdoc}.
-   */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    
-    $config = $this->configFactory->get('youtube_import.settings');
-
-    //pulling from settings.yml file
-    //$apikey = $drupal_user = $username = $playlistid = $frequency = $contenttype = $lastrun = '';
-
-
-    /*
-
-    if ($config->get('smtp_on')) {
-      drupal_set_message(t('SMTP module is active.'));
-    }
-    else {
-      drupal_set_message(t('SMTP module is INACTIVE.'));
-    }
-    drupal_set_message(t('Disabled fields are overridden in site-specific configuration file.'), 'warning');
-
-    */
-
-    // Create the field for the API key.
-    $form['apikey'] = array(
-      '#type' => 'textfield',
-      '#required' => TRUE,
-      '#title' => t('YouTube API key.'),
-      '#default_value' => $config->get('apikey'),
-    );
-
-    // Create the field for the username.
-  $form['username'] = array(
-    '#type' => 'textfield',
-    '#title' => t('YouTube user name or your channel ID'),
-    '#description' => t('This value is only used to get the playlist id. If you know the playlist id, you may leave this blank but be sure to fill in one or the other'),
-    '#default_value' => $config->get('username'),
-  );
-
-  // Create the field for the playlist id.
-  $form['playlistid'] = array(
-    '#type' => 'textfield',
-    '#title' => t('YouTube play list ID.'),
-    '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
-    '#default_value' => $config->get('playlistid'),
-  );
-
-  // Create the fequency setting.
-  $form['frequency'] = array(
-    '#type' => 'textfield',
-    '#required' => TRUE,
-    '#title' => t('Cron Frequency'),
-    '#description' => t('Enter 0 to disable the cron job. Enter the time in seconds to have it run during cron.'),
-    '#default_value' => $config->get('frequency'),
-  );
-
-  // Create the content type drop down.
-  $form['contenttype'] = array(
-    '#type' => 'select',
-    '#required' => TRUE,
-    '#title' => t('Content Type'),
-    '#options' => node_type_get_names(),
-    '#default_value' => $config->get('contenttype'),
-    '#description' => t('Select the content type that videos should import to'),
-  );
-
-    /*
-    $form['onoff']['smtp_on'] = array(
-      '#type' => 'radios',
-      '#title' => t('Turn this module on or off'),
-      '#default_value' => $config->get('smtp_on') ? 'on' : 'off',
-      '#options' => array('on' => t('On'), 'off' => t('Off')),
-      '#description' => t('To uninstall this module you must turn it off here first.'),
-      '#disabled' => $this->isOverridden('smtp_on'),
-    );
-    $form['server'] = array(
-      '#type'  => 'details',
-      '#title' => t('SMTP server settings'),
-      '#open' => TRUE,
-    );
-    $form['server']['smtp_host'] = array(
-      '#type' => 'textfield',
-      '#title' => t('SMTP server'),
-      '#default_value' => $config->get('smtp_host'),
-      '#description' => t('The address of your outgoing SMTP server.'),
-      '#disabled' => $this->isOverridden('smtp_host'),
-    );
-    $form['server']['smtp_hostbackup'] = array(
-      '#type' => 'textfield',
-      '#title' => t('SMTP backup server'),
-      '#default_value' => $config->get('smtp_hostbackup'),
-      '#description' => t('The address of your outgoing SMTP backup server. If the primary server can\'t be found this one will be tried. This is optional.'),
-      '#disabled' => $this->isOverridden('smtp_hostbackup'),
-    );
-    $form['server']['smtp_port'] = array(
-      '#type' => 'number',
-      '#title' => t('SMTP port'),
-      '#size' => 6,
-      '#maxlength' => 6,
-      '#default_value' => $config->get('smtp_port'),
-      '#description' => t('The default SMTP port is 25, if that is being blocked try 80. Gmail uses 465. See :url for more information on configuring for use with Gmail.', array(':url' => 'http://gmail.google.com/support/bin/answer.py?answer=13287')),
-      '#disabled' => $this->isOverridden('smtp_port'),
-    );
-    // Only display the option if openssl is installed.
-    if (function_exists('openssl_open')) {
-      $encryption_options = array(
-        'standard' => t('No'),
-        'ssl' => t('Use SSL'),
-        'tls' => t('Use TLS'),
-      );
-      $encryption_description = t('This allows connection to an SMTP server that requires SSL encryption such as Gmail.');
-    }
-    // If openssl is not installed, use normal protocol.
-    else {
-      $config->set('smtp_protocol', 'standard');
-      $encryption_options = array('standard' => t('No'));
-      $encryption_description = t('Your PHP installation does not have SSL enabled. See the :url page on php.net for more information. Gmail requires SSL.', array(':url' => 'http://php.net/openssl'));
-    }
-    $form['server']['smtp_protocol'] = array(
-      '#type' => 'select',
-      '#title' => t('Use encrypted protocol'),
-      '#default_value' => $config->get('smtp_protocol'),
-      '#options' => $encryption_options,
-      '#description' => $encryption_description,
-      '#disabled' => $this->isOverridden('smtp_protocol'),
-    );
-
-    $form['auth'] = array(
-      '#type' => 'details',
-      '#title' => t('SMTP Authentication'),
-      '#description' => t('Leave blank if your SMTP server does not require authentication.'),
-      '#open' => TRUE,
-    );
-    $form['auth']['smtp_username'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Username'),
-      '#default_value' => $config->get('smtp_username'),
-      '#description' => t('SMTP Username.'),
-      '#disabled' => $this->isOverridden('smtp_username'),
-    );
-    $form['auth']['smtp_password'] = array(
-      '#type' => 'password',
-      '#title' => t('Password'),
-      '#default_value' => $config->get('smtp_password'),
-      '#description' => t('SMTP password. If you have already entered your password before, you should leave this field blank, unless you want to change the stored password. Please note that this password will be stored as plain-text inside Drupal\'s core configuration variables.'),
-      '#disabled' => $this->isOverridden('smtp_password'),
-    );
-
-    $form['email_options'] = array(
-      '#type'  => 'details',
-      '#title' => t('E-mail options'),
-      '#open' => TRUE,
-    );
-    $form['email_options']['smtp_from'] = array(
-      '#type' => 'textfield',
-      '#title' => t('E-mail from address'),
-      '#default_value' => $config->get('smtp_from'),
-      '#description' => t('The e-mail address that all e-mails will be from.'),
-      '#disabled' => $this->isOverridden('smtp_from'),
-    );
-    $form['email_options']['smtp_fromname'] = array(
-      '#type' => 'textfield',
-      '#title' => t('E-mail from name'),
-      '#default_value' => $config->get('smtp_fromname'),
-      '#description' => t('The name that all e-mails will be from. If left blank will use a default of: @name',
-          ['@name' => $this->configFactory->get('system.site')->get('name')]),
-      '#disabled' => $this->isOverridden('smtp_fromname'),
-    );
-    $form['email_options']['smtp_allowhtml'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Allow to send e-mails formatted as HTML'),
-      '#default_value' => $config->get('smtp_allowhtml'),
-      '#description' => t('Checking this box will allow HTML formatted e-mails to be sent with the SMTP protocol.'),
-      '#disabled' => $this->isOverridden('smtp_allowhtml'),
-    );
-
-    $form['client'] = array(
-      '#type'  => 'details',
-      '#title' => t('SMTP client settings'),
-      '#open' => TRUE,
-    );
-    $form['client']['smtp_client_hostname'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Hostname'),
-      '#default_value' => $config->get('smtp_client_hostname'),
-      '#description' => t('The hostname to use in the Message-Id and Received headers, and as the default HELO string. Leave blank for using %server_name.', array('%server_name' => isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost.localdomain')),
-      '#disabled' => $this->isOverridden('smtp_client_hostname'),
-    );
-    $form['client']['smtp_client_helo'] = array(
-      '#type' => 'textfield',
-      '#title' => t('HELO'),
-      '#default_value' => $config->get('smtp_client_helo'),
-      '#description' => t('The SMTP HELO/EHLO of the message. Defaults to hostname (see above).'),
-      '#disabled' => $this->isOverridden('smtp_client_helo'),
-    );
-
-    $form['email_test'] = array(
-      '#type' => 'details',
-      '#title' => t('Send test e-mail'),
-      '#open' => TRUE,
-    );
-    $form['email_test']['smtp_test_address'] = array(
-      '#type' => 'textfield',
-      '#title' => t('E-mail address to send a test e-mail to'),
-      '#default_value' => '',
-      '#description' => t('Type in an address to have a test e-mail sent there.'),
-    );
-
-    $form['smtp_debugging'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enable debugging'),
-      '#default_value' => $config->get('smtp_debugging'),
-      '#description' => t('Checking this box will print SMTP messages from the server for every e-mail that is sent.'),
-      '#disabled' => $this->isOverridden('smtp_debugging'),
-    );
-    */
-
-    return parent::buildForm($form, $form_state);
-
-    
-  }
-
-  /**
-   * Check if config variable is overridden by the settings.php.
-   *
-   * @param string $name
-   *  STMP settings key.
-   *
-   * @return bool
-   */
-  protected function isOverridden($name) {
-    $original = $this->configFactory->getEditable('smtp.settings')->get($name);
-    $current = $this->configFactory->get('smtp.settings')->get($name);
-    return $original != $current;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $values = $form_state->getValues();
-
-    if ($values['smtp_on'] == 'on' && $values['smtp_host'] == '') {
-      $form_state->setErrorByName('smtp_host', $this->t('You must enter an SMTP server address.'));
+    /**
+     * {@inheritdoc}.
+     */
+    public function getFormID()
+    {
+        return 'youtube_import_admin_settings';
     }
 
-    if ($values['smtp_on'] == 'on' && $values['smtp_port'] == '') {
-      $form_state->setErrorByName('smtp_port', $this->t('You must enter an SMTP port number.'));
+    /**
+     * {@inheritdoc}.
+     */
+    public function buildForm(array $form, FormStateInterface $form_state)
+    {
+
+        //dont need the config since savedConfig truncates. Still keeping just in case. 
+        $config = $this->configFactory->get('youtube_import.settings');
+
+        $savedConfig = youtube_import_get();
+
+        $mapping = array();
+
+        // A flag to see if there is a youtube field.
+        $has_youtube_field = FALSE;
+
+        $apikey = $playlistid = '';
+        /*
+        // Create the help link html.
+        $markup = t('For configuration instructions visit&nbsp;') . l(
+                t('/admin/help/youtube_import'),
+                '/admin/help/youtube_import',
+                array('attributes' => array('target' => '_blank'))
+            );
+        */
+
+        // Add the help  link to the form.
+        //$form['help_link'] = array(
+        //   '#markup' => "<p>{$markup}</p>",
+        //);
+
+        // Create the field for the API key.
+        $form['apikey'] = array(
+            '#type' => 'textfield',
+            '#required' => TRUE,
+            '#title' => t('YouTube API key.'),
+            '#default_value' => isset($savedConfig['apikey']) ? $savedConfig['apikey'] : $config->get('apikey'),
+        );
+
+        // Create the field for the username.
+        $form['username'] = array(
+            '#type' => 'textfield',
+            '#title' => t('YouTube user name or your channel ID'),
+            '#description' => t('This value is only used to get the playlist id. If you know the playlist id, you may leave this blank but be sure to fill in one or the other'),
+            '#default_value' => isset($savedConfig['username']) ? $savedConfig['username'] : $config->get('username'),
+        );
+
+        // Create the field for the playlist id.
+        $form['playlistid'] = array(
+            '#type' => 'textfield',
+            '#title' => t('YouTube play list ID.'),
+            '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+            '#default_value' => isset($savedConfig['playlistid']) ? $savedConfig['playlistid'] : $config->get('playlistid'),
+        );
+
+        // Create the fequency setting.
+        $form['frequency'] = array(
+            '#type' => 'textfield',
+            '#required' => TRUE,
+            '#title' => t('Cron Frequency'),
+            '#description' => t('Enter 0 to disable the cron job. Enter the time in seconds to have it run during cron.'),
+            '#default_value' => isset($savedConfig['frequency']) ? $savedConfig['frequency'] : $config->get('frequency'),
+        );
+
+        // Create the content type drop down.
+        $form['contenttype'] = array(
+            '#type' => 'select',
+            '#required' => TRUE,
+            '#title' => t('Content Type'),
+            '#options' => node_type_get_names(),
+            '#default_value' => isset($savedConfig['contenttype']) ? $savedConfig['contenttype'] : $config->get('contenttype'),
+            '#description' => t('Select the content type that videos should import to'),
+        );
+
+        // Get the usernames from the Drupal database.
+
+        $ids = \Drupal::entityQuery('user')
+            ->condition('status', 1)
+            ->execute();
+        $user_data = User::loadMultiple($ids);
+
+        //$users = array('', '');
+        $users = array();
+
+        foreach ($user_data as $user_d) {
+            //    $users[$user_d->uid] = $user_d->name;
+            //$userinfo = $user_data->getData();
+
+            //get user id
+            $uid = $user_d->get('uid')->getValue();
+            //get value of id
+            $uid = $uid[0]['value'];
+
+            //get user name
+            $name = $user_d->get('name')->getValue();
+            //get value of id
+            $name = $name[0]['value'];
+
+            $users[$uid] = $name;
+        }
+
+        //var_dump($users);
+        //var_dump($user_data);
+        //kint($user_data);
+
+        /*
+      $user_data = db_query("SELECT uid,name FROM {users} WHERE status=1");
+      $users = array('', '');
+      foreach ($user_data as $user_data) {
+          $users[$user_data->uid] = $user_data->name;
+      }*/
+
+        // Author selection drop down.
+        $form['drupal_user'] = array(
+            '#type' => 'select',
+            '#title' => t('Author'),
+            '#options' => $users,
+            '#default_value' => isset($savedConfig['drupal_user']) ? $savedConfig['drupal_user'] : $config->get('drupal_user'),
+            '#required' => FALSE,
+            '#description' => t('YouTube import will default to the current user or the user selected here.'),
+        );
+
+        if ($apikey && $playlistid) {
+
+            // Create the run link html.
+            $markup = l(t('Click here to run the import now.'), 'admin/content/youtube-import/run-now');
+
+            // If there is a lastrun date, lets display it.
+            if ($lastrun) {
+                $markup .= ' (Last run: ' . format_date((int)$lastrun, 'long') . ')';
+            }
+
+            // Add the link to the form.
+            $form['youtube_import_run_link'] = array(
+                '#markup' => "<p>{$markup}</p>",
+            );
+        }
+
+
+        /*
+         * The form has 2 submit buttons because the mapping area
+         * could get long and tedious to scroll through
+         * this is the first one.
+         */
+        /*
+        $form['submittop'] = array(
+            '#type' => 'submit',
+            '#value' => t('Save configuration'),
+        );
+*/
+        // If there is no content type, then we can't select fields.
+        if (!empty($contenttype)) {
+
+            /*
+             * Just a heading to let the user know this is the
+             * mapping section.
+             */
+            $form['mapheading'] = array(
+                '#type' => 'markup',
+                '#markup' => '<h2>' . t('Field Mapping') . '</h2>',
+            );
+
+            // Retrieve the fields for the content type.
+            $fieldinfo = field_info_instances('node', $contenttype);
+
+            /*
+             * Initialize an array for the field names and labels
+             * as well as add the ones that do not show up.
+             */
+            $fields = array('title' => t('Title'), 'created' => 'Created');
+
+            /*
+             * Loop through the fields and add them to our
+             * more useful array.
+             */
+            foreach ($fieldinfo as $key => $value) {
+                // Need to mark youtube fields as they are always included.
+                if ($value['widget']['type'] == 'youtube') {
+                    $fields[$key] = $value['label'] . '*';
+                    $has_youtube_field = TRUE;
+                } else {
+                    $fields[$key] = $value['label'];
+                }
+            }
+
+            /*
+             * Get the properties that we can pull
+             * from YouTube.
+             */
+            $properties = array(
+                '' => t('None'),
+                'title' => t('Title'),
+                'description' => t('Description'),
+                'publishedAt' => t('Published Date'),
+                'thumbnails' => t('Thumbnail Image'),
+                'id' => t('Video ID'),
+                'url' => t('Share URL'),
+                'duration' => t('Duration'),
+                'dimension' => t('Dimension'),
+                'definition' => t('Definition'),
+                'viewCount' => t('Number of Views'),
+                'likeCount' => t('Number of Likes'),
+                'dislikeCount' => t('Number of dislikes'),
+                'favoriteCount' => t('Number of Favorites'),
+                'commentCount' => t('Number of comments'),
+            );
+
+            // Create our indefinite field element.
+            $form['mapping'] = array(
+                '#tree' => TRUE,
+            );
+
+            /*
+             * Loop through each of the fields in the
+             * content type and create a mapping drop down
+             * for each.
+             */
+            foreach ($fields as $fieldname => $label) {
+
+                // YouTube fields are added automatically.
+                if (strpos($label, '*') !== FALSE) {
+                    $form['mapping'][$fieldname] = array(
+                        '#type' => 'select',
+                        '#title' => t("@l <small>@f</small>", array('@f' => $fieldname, '@l' => $label)),
+                        '#options' => $properties,
+                        '#value' => 'url',
+                        '#disabled' => TRUE,
+                    );
+                } else {
+                    // Create the mapping dropdown.
+                    $form["mapping"][$fieldname] = array(
+                        '#type' => 'select',
+                        '#title' => t("@l <small>@f</small>", array('@f' => $fieldname, '@l' => $label)),
+                        '#options' => $properties,
+                        '#default_value' => isset($mapping[$fieldname]) ? $mapping[$fieldname] : NULL,
+                    );
+                }
+            }
+
+            // If there is a youtube field, need to explain *.
+            if ($has_youtube_field) {
+                $form['youtube_markup'] = array(
+                    '#type' => 'markup',
+                    '#markup' => '<p>' . t('YouTube fields are automatically added to the mapping.') . '</p>',
+                );
+            }
+
+            // Create the submit button at the bottom of the form.
+            /*$form['submit'] = array(
+                '#type' => 'submit',
+                '#value' => t('Save Configuration Settings 1'),
+            );*/
+
+        }
+
+
+        return parent::buildForm($form, $form_state);
+
+
     }
 
-    if ($values['smtp_from'] && !\Drupal::service('email.validator')->isValid($values['smtp_from'])) {
-      $form_state->setErrorByName('smtp_from', $this->t('The provided from e-mail address is not valid.'));
+    /**
+     * Check if config variable is overridden by the settings.php.
+     *
+     * @param string $name
+     *  STMP settings key.
+     *
+     * @return bool
+     */
+    protected function isOverridden($name)
+    {
+        $original = $this->configFactory->getEditable('smtp.settings')->get($name);
+        $current = $this->configFactory->get('smtp.settings')->get($name);
+        return $original != $current;
     }
 
-    if ($values['smtp_test_address'] && !\Drupal::service('email.validator')->isValid($values['smtp_test_address'])) {
-      $form_state->setErrorByName('smtp_test_address', $this->t('The provided test e-mail address is not valid.'));
+    /**
+     * {@inheritdoc}
+     */
+    public function validateForm(array &$form, FormStateInterface $form_state)
+    {
+        $values = $form_state->getValues();
+        //kern($form);
+
+        if (empty($values['username']) && empty($values['playlistid'])) {
+            $form_state->setError($form, t('The username and playlist id cannot both be blank.'));
+            $form_state->setError($form);
+        }
     }
 
-    // If username is set empty, we must set both username/password empty as well.
-    if (empty($values['smtp_username'])) {
-      $values['smtp_password'] = '';
-    }
-    // A little hack. When form is presented, the password is not shown (Drupal way of doing).
-    // So, if user submits the form without changing the password, we must prevent it from being reset.
-    elseif (empty($values['smtp_password'])) {
-      $form_state->unsetValue('smtp_password');
-    }
-  }
+    /**
+     * {@inheritdoc}
+     */
+    public function submitForm(array &$form, FormStateInterface $form_state)
+    {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $values = $form_state->getValues();
-    $config = $this->configFactory->getEditable('smtp.settings');
-    $mail_config = $this->configFactory->getEditable('system.mail');
-    $mail_system = $mail_config->get('interface.default');
+        //Get form state values
+        $values = $form_state->getValues();
 
-    // Updating config vars.
-    if (isset($values['smtp_password']) && !$this->isOverridden('smtp_password')) {
-      $config->set('smtp_password', $values['smtp_password']);
-    }
-    if (!$this->isOverridden('smtp_on')) {
-      $config->set('smtp_on', $values['smtp_on'] == 'on')->save();
-    }
-    $config_keys = [
-      'smtp_host',
-      'smtp_hostbackup',
-      'smtp_port',
-      'smtp_protocol',
-      'smtp_username',
-      'smtp_from',
-      'smtp_fromname',
-      'smtp_client_hostname',
-      'smtp_client_helo',
-      'smtp_allowhtml',
-      'smtp_debugging',
-    ];
-    foreach ($config_keys as $name) {
-      if (!$this->isOverridden($name)) {
-        $config->set($name, $values[$name])->save();
-      }
-    }
+        // Get the previous settings.
+        $settings = youtube_import_get();
 
-    // Set as default mail system if module is enabled.
-    if ($config->get('smtp_on')) {
-      if ($mail_system != 'SMTPMailSystem') {
-        $config->set('prev_mail_system', $mail_system);
-      }
-      $mail_system = 'SMTPMailSystem';
-      $mail_config->set('interface.default', $mail_system)->save();
-    }
-    else {
-      $default_system_mail = 'php_mail';
-      $mail_config = $this->configFactory->getEditable('system.mail');
-      $default_interface = ($mail_config->get('prev_mail_system')) ? $mail_config->get('prev_mail_system') : $default_system_mail;
-      $mail_config->set('interface.default', $default_interface)
-        ->save();
-    }
+        // Get the youtube settings list (non mapping stuff).
+        $setting_keys = array(
+            'username',
+            'drupal_user',
+            'apikey',
+            'playlistid',
+            'lastrun',
+            'frequency',
+            'contenttype',
+        );
 
-    // If an address was given, send a test e-mail message.
-    if ($test_address = $values['smtp_test_address']) {
-      $params['subject'] = t('Drupal SMTP test e-mail');
-      $params['body'] = array(t('If you receive this message it means your site is capable of using SMTP to send e-mail.'));
-      $account = \Drupal::currentUser();
-      // If module is off, send the test message with SMTP by temporarily overriding.
-      if (!$config->get('smtp_on')) {
-        $original = $mail_config->get('interface');
-        $mail_system = 'SMTPMailSystem';
-        $mail_config->set('interface.default', $mail_system)->save();
-      }
-      \Drupal::service('plugin.manager.mail')->mail('smtp', 'smtp-test', $test_address, $account->getPreferredLangcode(), $params);
-      if (!$config->get('smtp_on')) {
-        $mail_config->set('interface', $original)->save();
-      }
-      drupal_set_message(t('A test e-mail has been sent to @email via SMTP. You may want to check the log for any error messages.', ['@email' => $test_address]));
+        // Loop through the form values and see which matches we can find.
+        foreach ($setting_keys as $key) {
+
+            // Set the value or clear it depending on user submission.
+            if (array_key_exists($key, $values)) {
+                $settings[$key] = $values[$key];
+            } else {
+                $settings[$key] = '';
+            }
+        }
+
+        // Loop through the user updated mapping fields.
+        if (array_key_exists('mapping', $values)) {
+            foreach ($values['mapping'] as $key => $value) {
+                // Set the mapping value.
+                $settings['mapping'][$key] = $value;
+            }
+        }
+
+        // If the username was set and the playlist wasn't, let's get the default.
+        if (empty($settings['playlistid'])) {
+            $settings['playlistid'] = youtube_import_playlist_id($settings['username'], $settings['apikey']);
+        }
+
+        // Determine the level of success.
+        if (!empty($settings['playlistid'])) {
+            // Inform the user.
+            drupal_set_message(t('YouTube Import settings saved successfully.'));
+        } else {
+            drupal_set_message(t('Unable to set the play list ID.'), 'error');
+        }
+
+        // Save our settings.
+        youtube_import_set($settings);
+
+        parent::submitForm($form, $form_state);
     }
 
-    parent::submitForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo - Flesh this out.
-   */
-  public function getEditableConfigNames() {
-    return [
-      'youtube_import.settings',
-    ];
-  }
+    /**
+     * {@inheritdoc}
+     *
+     * @todo - Flesh this out.
+     */
+    public function getEditableConfigNames()
+    {
+        return [
+            'youtube_import.settings',
+        ];
+    }
 
 }
