@@ -3,6 +3,8 @@
 use \Drupal\field\Entity\FieldStorageConfig;
 use \Drupal\Core\Entity;
 use \Drupal\node\Entity\Node;
+use \Drupal\Component\Utility\Html;
+use Drupal\Core\Language\Language;
 
 /**
  * @file
@@ -166,7 +168,6 @@ function youtube_import_cron()
 }
 
 
-
 /**
  * Sends a curl request to a web address.
  */
@@ -272,6 +273,7 @@ function youtube_import_video_ids()
 /**
  * Finds or creates node by YouTubeId.
  */
+
 function youtube_import_find($youtube_id)
 {
     $settings = youtube_import_get();
@@ -290,6 +292,7 @@ function youtube_import_find($youtube_id)
 
     //drupal 8 conversion
     $fieldinfo = \Drupal::entityManager()->getFieldDefinitions('node', $contenttype);
+
 
     // Initialize the $id_field.
     $id_field = array();
@@ -340,10 +343,16 @@ function youtube_import_find($youtube_id)
     // If we didn't find it, create it.
     //$entity = entity_create('node', array('type' => $contenttype));
 
-    $entity = Node::create(array('type' => $contenttype));
+    $entity = Node::create(
+        array(
+            'type' => $contenttype,
+            'title' => 'New Videro',
+            'body' => 'New Bodero'
+        )
+    );
 
-    //kint($entity);
-    //exit();
+    $entity->save();
+
     //return entity_metadata_wrapper('node', $entity);
     return $entity;
 }
@@ -393,18 +402,17 @@ function youtube_import_videos()
         $data->items = array();
     }
 
-    foreach ($data->items as $video) {
-      kint($video);
-
-    }
-    exit();
 
     // Loop through the data to create our nodes.
     foreach ($data->items as $video) {
         // Find the node or create a new one.
         $wrapper = youtube_import_find($video->id);
+
         $wrapper->status = 1;
-        $wrapper->language(LANGUAGE_NONE);
+        //drupal 7
+        //$wrapper->language(LANGUAGE_NONE);
+        //drupal 8
+        $wrapper->language(Language::LANGCODE_NOT_SPECIFIED);
 
         // Loop through the field mapping.
         foreach ($mapping as $fieldname => $property) {
@@ -428,6 +436,8 @@ function youtube_import_videos()
             $value = isset($video->statistics->$property) ? $video->statistics->$property : $value;
             $value = $property == 'url' ? 'https://www.youtube.com/v/' . $video->id : $value;
 
+            kint($value);
+            exit();
             /*
              * Thumbnails are really special and we want to get
              * the best image to create the thumbnail
@@ -496,7 +506,7 @@ function youtube_import_videos()
                  */
                 drupal_set_message(t("This module is unable to set the value for a field with of @type type. Please remove @field from the import.", array('@type' => $wrapper->$fieldname->type(), '@field' => $fieldname)), 'error');
             }
-        }
+        }// ends here
 
         // Set the author.
         if (!empty($drupal_user)) {
@@ -508,7 +518,7 @@ function youtube_import_videos()
     }
 
     // Tell how many we found.
-    drupal_set_message(check_plain(count($data->items)) . ' videos found.');
+    drupal_set_message(Html::escape(count($data->items)) . ' videos found.');
 
     // Update the timestamp.
     youtube_import_set('lastrun', time());

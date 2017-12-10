@@ -3,6 +3,7 @@
 namespace Drupal\youtube_import\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class youtube_import_run extends ControllerBase
 {
@@ -14,7 +15,15 @@ class youtube_import_run extends ControllerBase
     {
         // All this does is trigger the run from a url.
         youtube_import_videos();
-        // Sedirect to somewhere.
-        drupal_goto('admin/content/youtube-import');
+        // Redirect to somewhere.
+        //$this->redirect_me('/admin/content/youtube-import');
+        $this->redirect_me('/admin/config/system/youtube_import');
+    }
+
+    function redirect_me($path)
+    {
+        $response = new RedirectResponse($path);
+        $response->send();
+        return;
     }
 }

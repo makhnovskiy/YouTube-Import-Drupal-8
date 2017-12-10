@@ -14,6 +14,9 @@ use  \Drupal\user\Entity\User;
 //used for setting links
 use Drupal\Core\Url;
 
+//entity manager
+use \Drupal\Core\Entity;
+
 /**
  * Implements the SMTP admin settings form.
  */
@@ -197,9 +200,18 @@ class youtube_import_form extends ConfigFormBase
             '#type' => 'submit',
             '#value' => t('Save configuration'),
         );
+
+
 */
+
+        if (isset($savedConfig['contenttype'])) {
+            $contenttype = $savedConfig['contenttype'];
+        }
+
+
         // If there is no content type, then we can't select fields.
         if (!empty($contenttype)) {
+
 
             /*
              * Just a heading to let the user know this is the
@@ -210,8 +222,13 @@ class youtube_import_form extends ConfigFormBase
                 '#markup' => '<h2>' . t('Field Mapping') . '</h2>',
             );
 
+            // Drupal 7 -
             // Retrieve the fields for the content type.
-            $fieldinfo = field_info_instances('node', $contenttype);
+            //$fieldinfo = field_info_instances('node', $contenttype);
+
+            //Drupal 8
+            $fieldinfo = \Drupal::entityManager()->getFieldDefinitions('node', $contenttype);
+
 
             /*
              * Initialize an array for the field names and labels
@@ -223,15 +240,26 @@ class youtube_import_form extends ConfigFormBase
              * Loop through the fields and add them to our
              * more useful array.
              */
+            //kint($fieldinfo);
+            //exit();
+
             foreach ($fieldinfo as $key => $value) {
                 // Need to mark youtube fields as they are always included.
-                if ($value['widget']['type'] == 'youtube') {
+                //if ($value['widget']['type'] == 'youtube') {
+                // kint($value);
+
+                if ($value->getDataType() == 'youtube') {
                     $fields[$key] = $value['label'] . '*';
                     $has_youtube_field = TRUE;
                 } else {
-                    $fields[$key] = $value['label'];
+                    //drupal 7
+                    //$fields[$key] = $value['label'];
+
+                    //drupal 8
+                    $fields[$key] = $value->getLabel();
                 }
             }
+
 
             /*
              * Get the properties that we can pull
@@ -277,12 +305,14 @@ class youtube_import_form extends ConfigFormBase
                         '#disabled' => TRUE,
                     );
                 } else {
+
                     // Create the mapping dropdown.
                     $form["mapping"][$fieldname] = array(
                         '#type' => 'select',
                         '#title' => t("@l <small>@f</small>", array('@f' => $fieldname, '@l' => $label)),
                         '#options' => $properties,
-                        '#default_value' => isset($mapping[$fieldname]) ? $mapping[$fieldname] : NULL,
+                        '#default_value' => isset($savedConfig['mapping'][$fieldname]) ? $savedConfig['mapping'][$fieldname] : NULL
+                        //'#default_value' => isset($mapping[$fieldname]) ? $mapping[$fieldname] : NULL,
                     );
                 }
             }
