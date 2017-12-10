@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 //used for getting all users 
 use  \Drupal\user\Entity\User;
 
+//used for setting links
+use Drupal\Core\Url;
+
 /**
  * Implements the SMTP admin settings form.
  */
@@ -31,7 +34,7 @@ class youtube_import_form extends ConfigFormBase
     public function buildForm(array $form, FormStateInterface $form_state)
     {
 
-        //dont need the config since savedConfig truncates. Still keeping just in case. 
+        //dont need the config since savedConfig truncates. Still keeping just in case.
         $config = $this->configFactory->get('youtube_import.settings');
 
         $savedConfig = youtube_import_get();
@@ -147,10 +150,30 @@ class youtube_import_form extends ConfigFormBase
             '#description' => t('YouTube import will default to the current user or the user selected here.'),
         );
 
+        $apikey = null;
+        $playlistid = null;
+        $lastrun = null;
+
+        if (isset($savedConfig['apikey']) && $savedConfig['apikey'] != '') {
+            $apikey = $savedConfig['apikey'];
+        }
+
+        if (isset($savedConfig['playlistid']) && $savedConfig['playlistid'] != '') {
+            $playlistid = $savedConfig['playlistid'];
+        }
+
+        if (isset($savedConfig['lastrun']) && $savedConfig['lastrun'] != '') {
+            $lastrun = $savedConfig['lastrun'];
+        }
+
+
         if ($apikey && $playlistid) {
 
+            //generate url
+            $url = Url::fromRoute('youtube_import.run_now');
+
             // Create the run link html.
-            $markup = l(t('Click here to run the import now.'), 'admin/content/youtube-import/run-now');
+            $markup = \Drupal::l(t('Click here to run the import now.'), $url);
 
             // If there is a lastrun date, lets display it.
             if ($lastrun) {

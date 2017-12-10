@@ -1,5 +1,8 @@
 <?php
 
+use \Drupal\field\Entity\FieldStorageConfig;
+use \Drupal\Core\Entity;
+
 /**
  * @file
  * The primary file in the YouTube module.
@@ -161,16 +164,7 @@ function youtube_import_cron()
     }
 }
 
-/**
- * A menu location to call the run.
- */
-function youtube_import_run_now()
-{
-    // All this does is trigger the run from a url.
-    youtube_import_videos();
-    // Sedirect to somewhere.
-    drupal_goto('admin/content/youtube-import');
-}
+
 
 /**
  * Sends a curl request to a web address.
@@ -373,7 +367,13 @@ function youtube_import_videos()
     $data = youtube_import_call("https://www.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id={$ids}&key={$apikey}");
 
     // Get the fields that are actually related to this content type.
-    $fieldinfo = array_keys(field_info_instances('node', $contenttype));
+    $fieldinfo = \Drupal::entityManager()->getFieldDefinitions('node', $contenttype);
+    
+    // drupal 8 - pauls approach -
+    //$fieldinfo = array_keys( Field::fieldInfo()->getBundleInstance('node', $contenttype));
+
+    // drupal 7 original code
+    //$fieldinfo = array_keys(field_info_instances('node', $contenttype));
     $fieldinfo[] = 'title';
     $fieldinfo[] = 'created';
 
