@@ -302,8 +302,9 @@ function youtube_import_find($youtube_id)
         if (!array_key_exists($fieldname, $mapping)) {
             continue;
         }
+
         // Keep track of the YouTube ID field.
-        if ($mapping[$fieldname] == 'id' || $field['widget']['type'] == 'youtube') {
+        if ($mapping[$fieldname] == 'vid' || $field->getType() == 'youtube') {
             $id_field = $field;
             break;
         }
@@ -317,15 +318,16 @@ function youtube_import_find($youtube_id)
     if (count($id_field) > 0) {
 
         // Determine the type of condition.
-        if ($id_field['widget']['type'] == 'youtube') {
-            $condition = "t.{$id_field['field_name']}_video_id";
+        if ($id_field->getType() == 'youtube') {
+
+            $condition = "t.{$id_field->getName()}_video_id";
         } else {
             // If it is not a YouTube field we need the value.
-            $condition = "t.{$id_field['field_name']}_value";
+            $condition = "t.{$id_field->getName()}_value";
         }
 
         // Search the database for the 1st existing node.
-        $results = db_select("field_data_{$id_field['field_name']}", 't')
+        $results = db_select("field_data_{$id_field->getName()}", 't')
             ->fields('t', array('entity_id'))
             ->condition($condition, $youtube_id, "LIKE")
             ->execute();
