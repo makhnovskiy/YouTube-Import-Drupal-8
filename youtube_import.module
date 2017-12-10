@@ -2,6 +2,7 @@
 
 use \Drupal\field\Entity\FieldStorageConfig;
 use \Drupal\Core\Entity;
+use \Drupal\node\Entity\Node;
 
 /**
  * @file
@@ -284,7 +285,11 @@ function youtube_import_find($youtube_id)
      */
 
     // Get the fields for this content type.
-    $fieldinfo = field_info_instances('node', $contenttype);
+    //orig drupal 7 code
+    //$fieldinfo = field_info_instances('node', $contenttype);
+
+    //drupal 8 conversion
+    $fieldinfo = \Drupal::entityManager()->getFieldDefinitions('node', $contenttype);
 
     // Initialize the $id_field.
     $id_field = array();
@@ -333,8 +338,14 @@ function youtube_import_find($youtube_id)
     }
 
     // If we didn't find it, create it.
-    $entity = entity_create('node', array('type' => $contenttype));
-    return entity_metadata_wrapper('node', $entity);
+    //$entity = entity_create('node', array('type' => $contenttype));
+
+    $entity = Node::create(array('type' => $contenttype));
+
+    //kint($entity);
+    //exit();
+    //return entity_metadata_wrapper('node', $entity);
+    return $entity;
 }
 
 /**
@@ -368,7 +379,7 @@ function youtube_import_videos()
 
     // Get the fields that are actually related to this content type.
     $fieldinfo = \Drupal::entityManager()->getFieldDefinitions('node', $contenttype);
-    
+
     // drupal 8 - pauls approach -
     //$fieldinfo = array_keys( Field::fieldInfo()->getBundleInstance('node', $contenttype));
 
@@ -381,6 +392,12 @@ function youtube_import_videos()
     if (empty($data->items)) {
         $data->items = array();
     }
+
+    foreach ($data->items as $video) {
+      kint($video);
+
+    }
+    exit();
 
     // Loop through the data to create our nodes.
     foreach ($data->items as $video) {
