@@ -314,6 +314,8 @@ function youtube_import_find($youtube_id)
      * If we found a field for the id, we will check for an existing node.
      * If the user did not set this up properly, we are going to be adding
      * new videos for every run. Can't be helped.
+     * New Bodero
+     *
      */
     if (count($id_field) > 0) {
 
@@ -327,7 +329,7 @@ function youtube_import_find($youtube_id)
         }
 
         // Search the database for the 1st existing node.
-        $results = db_select("field_data_{$id_field->getName()}", 't')
+        $results = db_select("node__{$id_field->getName()}", 't')
             ->fields('t', array('entity_id'))
             ->condition($condition, $youtube_id, "LIKE")
             ->execute();
@@ -438,8 +440,6 @@ function youtube_import_videos()
             $value = isset($video->statistics->$property) ? $video->statistics->$property : $value;
             $value = $property == 'url' ? 'https://www.youtube.com/v/' . $video->id : $value;
 
-            kint($value);
-            exit();
             /*
              * Thumbnails are really special and we want to get
              * the best image to create the thumbnail
@@ -471,6 +471,7 @@ function youtube_import_videos()
 
             try {
 
+
                 // If this field is the thumbnail.
                 if ($property == 'thumbnails') {
                     // Create the file location.
@@ -486,11 +487,12 @@ function youtube_import_videos()
                     }
                 } elseif ($fieldname == 'created') {
                     // Created date can be set directly.
-                    $wrapper->$fieldname->set(strtotime($value));
-                } elseif ($wrapper->$fieldname->type() == 'text' || $wrapper->$fieldname->type() == 'integer') {
+                    $wrapper->$fieldname->setValue(strtotime($value));
+                    //} elseif ($wrapper->$fieldname->type() == 'text' || $wrapper->$fieldname->type() == 'integer') {
+                } elseif ($wrapper->$fieldname->getFieldDefinition()->getType() == 'text' || $wrapper->$fieldname->getFieldDefinition()->getType() == 'integer') {
                     // If this is a text or number.
                     $wrapper->$fieldname = $value;
-                } elseif ($wrapper->$fieldname->type() == 'youtube') {
+                } elseif ($wrapper->$fieldname->getFieldDefinition()->getType() == 'youtube') {
                     // Special functionality needed for youtube fields.
                     $wrapper->$fieldname = array(
                         'input' => 'https://www.youtube.com/v/' . $video->id,
@@ -506,7 +508,7 @@ function youtube_import_videos()
                  * pain in the ass. So, every thing else throws a pretty
                  * error and makes it the user's problem.
                  */
-                drupal_set_message(t("This module is unable to set the value for a field with of @type type. Please remove @field from the import.", array('@type' => $wrapper->$fieldname->type(), '@field' => $fieldname)), 'error');
+                drupal_set_message(t("This module is unable to set the value for a field with of @type type. Please remove @field from the import.", array('@type' => $wrapper->$fieldname->getFieldDefinition()->getType(), '@field' => $fieldname)), 'error');
             }
         }// ends here
 
