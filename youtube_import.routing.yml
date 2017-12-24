@@ -1,0 +1,21 @@
+youtube_import.config:
+  path: '/admin/config/system/youtube_import'
+  defaults:
+    _title: 'STC Youtube Import Configuration'
+    _form: 'Drupal\youtube_import\Form\youtube_import_form'
+  requirements:
+    _permission: 'administer youtube_import module'
+youtube_import.run_now:
+  path: '/admin/config/system/youtube_import/run-now'
+  defaults:
+    _title: 'STC Youtube Import Run Now'
+    _title_context: 'Force the import to run now.'
+    _controller: '\Drupal\youtube_import\Controller\youtube_import_run::youtube_import_run_now'
+  requirements:
+    _permission: 'administer youtube_import module'
+help.page.youtube_import:
+  path: '/admin/help/youtube_import'
+    defaults:
+      _title: 'Youtube Import'
+      _title_context: 'Setup Page.'
+      _controller: '\Drupal\youtube_import\Controller\youtube_import_run::hook_help'

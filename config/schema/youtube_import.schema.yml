@@ -1,0 +1,34 @@
+youtube_import.settings:
+  type: config_object
+  label: 'Youtube Import Configurations'
+  mapping:
+    apikey:
+      type: text
+      label: 'Google API key for YouTube'
+    drupal_user:
+      type: text
+      label: 'Drupal user'
+    username:
+      type: text
+      label: 'YouTube Username'
+    playlistid:
+      type: text
+      label: 'YouTube playlist ID'
+    frequency:
+      type: text
+      label: 'frequency the import cron should run?'
+    contenttype:
+      type: text
+      label: 'Content type to publish videos on'
+    lastrun:
+      type: text
+      label: 'Last time that the import has run'
+    drupal_user:
+      type: text
+      label: 'User to publish the videos on'
+    url:
+      type: text
+      label: 'URL for video'
+    description:
+      type: text
+      label: 'Video description as it appears on YouTube'
