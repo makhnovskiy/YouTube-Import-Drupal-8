@@ -26,3 +26,9 @@ youtube_import.settings:
     drupal_user:
       type: text
       label: 'User to publish the videos on'
+    url:
+      type: text
+      label: 'URL for video'
+    description:
+      type: text
+      label: 'Video description as it appears on YouTube'

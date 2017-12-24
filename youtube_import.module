@@ -296,20 +296,17 @@ function youtube_import_find($youtube_id)
 
     // Initialize the $id_field.
     $id_field = array();
-
     // Check for matches.
     foreach ($fieldinfo as $fieldname => $field) {
         if (!array_key_exists($fieldname, $mapping)) {
             continue;
         }
-
         // Keep track of the YouTube ID field.
         if ($mapping[$fieldname] == 'vid' || $field->getType() == 'youtube') {
             $id_field = $field;
             break;
         }
     }
-
     /*
      * If we found a field for the id, we will check for an existing node.
      * If the user did not set this up properly, we are going to be adding
@@ -340,13 +337,14 @@ function youtube_import_find($youtube_id)
 
         // If I found it, load it.
         if ($results->rowCount()) {
-            return entity_metadata_wrapper('node', $results->fetchColumn());
+            return node_load($results->fetchColumn());
         }
     }
 
     // If we didn't find it, create it.
     //$entity = entity_create('node', array('type' => $contenttype));
-
+    // Should not be Empty!
+    //
     $entity = Node::create(
         array(
             'type' => $contenttype,
@@ -380,10 +378,10 @@ function youtube_import_videos()
     extract(youtube_import_get(), EXTR_OVERWRITE);
 
     // Set the $drupal_user to the current user if it is not set.
+
     if (empty($drupal_user)) {
         $drupal_user = $user->uid;
     }
-
     // Get the ids for the videos.
     $ids = implode(',', youtube_import_video_ids());
 
@@ -391,7 +389,7 @@ function youtube_import_videos()
     $data = youtube_import_call("https://www.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id={$ids}&key={$apikey}");
 
     // Get the fields that are actually related to this content type.
-    $fieldinfo = \Drupal::entityManager()->getFieldDefinitions('node', $contenttype);
+    $fieldinfo = array_keys(\Drupal::entityManager()->getFieldDefinitions('node', $contenttype));
 
     // drupal 8 - pauls approach -
     //$fieldinfo = array_keys( Field::fieldInfo()->getBundleInstance('node', $contenttype));
@@ -483,23 +481,23 @@ function youtube_import_videos()
 
                     // Make sure we haven't already done this.
                     if ($filepath = file_save_data(file_get_contents($value), $filename, FILE_EXISTS_REPLACE)) {
-                        $wrapper->$fieldname->file->set($filepath);
+                      $wrapper->set($fieldname, $filepath);
                     }
                 } elseif ($fieldname == 'created') {
                     // Created date can be set directly.
-                    $wrapper->$fieldname->setValue(strtotime($value));
+                    $wrapper->set($fieldname,strtotime($value));
                     //} elseif ($wrapper->$fieldname->type() == 'text' || $wrapper->$fieldname->type() == 'integer') {
                 } elseif ($wrapper->$fieldname->getFieldDefinition()->getType() == 'text' || $wrapper->$fieldname->getFieldDefinition()->getType() == 'integer') {
                     // If this is a text or number.
-                    $wrapper->$fieldname = $value;
+                    $wrapper->set($fieldname, $value);
                 } elseif ($wrapper->$fieldname->getFieldDefinition()->getType() == 'youtube') {
                     // Special functionality needed for youtube fields.
-                    $wrapper->$fieldname = array(
-                        'input' => 'https://www.youtube.com/v/' . $video->id,
+                    $wrapper->set($fieldname, array(
+                        'input' => 'https://www.youtube.com/watch?v=' . $video->id,
                         'video_id' => $video->id,
-                    );
+                    ));
                 } else {
-                    $wrapper->$fieldname = array('value' => $value);
+                    $wrapper->set($fieldname, array('value' => $value));
                 }
             } catch (Exception $ex) {
                 /*
@@ -511,12 +509,11 @@ function youtube_import_videos()
                 drupal_set_message(t("This module is unable to set the value for a field with of @type type. Please remove @field from the import.", array('@type' => $wrapper->$fieldname->getFieldDefinition()->getType(), '@field' => $fieldname)), 'error');
             }
         }// ends here
-
-        // Set the author.
+          // Set the author.
+          //
         if (!empty($drupal_user)) {
-            $wrapper->author = $drupal_user;
+            $wrapper->uid = $drupal_user;
         }
-
         // Save the node.
         $wrapper->save();
     }
