@@ -13,12 +13,6 @@ INTRODUCTION
 The YouTube import module imports data using the most recent version of the
 YouTube API into a content type as selected and configured by the administrator.
 
- * For a full description of the module, visit the project page:
-   https://www.drupal.org/sandbox/shaunfrisbee/2575089
-
- * To submit bug reports and feature suggestions, or to track changes:
-   https://www.drupal.org/project/issues/2575089
-
 REQUIREMENTS
 ------------
 This module require the following modules
@@ -52,9 +46,7 @@ RECOMMENDED MODULES
 
 INSTALLATION
 ------------
- * Install as you would normally install a contributed Drupal module. See:
-   https://drupal.org/documentation/install/modules-themes/modules-7
-   for further documentation
+ * Zip all contents and install via Drupal 8 Admin console. 
 
 CONFIGURATION
 -------------
@@ -80,4 +72,14 @@ CONFIGURATION
 MAINTAINERS
 -----------
 Current maintainers:
- * Shaun Thomas Frisbee (shaunfrisbee) - https://drupal.org/user/2750545
+ * Paul Makhnovskiy http://www.pmakhnovskiy.com
+ * Nazar Maksymchuk http://www.nmaksymchuk.com
+ * David Krasniy http://www.dkrasniy.com
+ 
+History
+-----------
+V 1.0 - Ported drupal 7 module to drupal 8. 
+ 
+Module Origin
+-----------
+Ported drupal 7 module: youtube import https://www.drupal.org/project/youtube_import
