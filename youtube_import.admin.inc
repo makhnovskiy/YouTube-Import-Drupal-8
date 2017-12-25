@@ -57,6 +57,103 @@ function youtube_import_form($form, &$form_state) {
     '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
     '#default_value' => $playlistid,
   );
+  // Create the content type drop down.
+  $form['contenttype'] = array(
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#title' => t('Content Type'),
+    '#options' => node_type_get_names(),
+    '#default_value' => $contenttype,
+    '#description' => t('Select the content type that videos should import to'),
+  );
+  $form['playlistid1'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube play list ID.'),
+    '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+    '#default_value' => $playlistid,
+  );
+
+  $form['contenttype1'] = array(
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#title' => t('Content Type'),
+    '#options' => node_type_get_names(),
+    '#default_value' => $contenttype,
+    '#description' => t('Select the content type that videos should import to'),
+  );
+  $form['playlistid2'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube play list ID.'),
+    '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+    '#default_value' => $playlistid,
+  );
+
+  $form['contenttype2'] = array(
+    '#type' => 'select',
+    '#required' => TRUE,
+    '#title' => t('Content Type'),
+    '#options' => node_type_get_names(),
+    '#default_value' => $contenttype,
+    '#description' => t('Select the content type that videos should import to'),
+  );
+  $form['playlistid3'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube play list ID.'),
+    '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+    '#default_value' => $playlistid,
+  );
+  $form['contenttype3'] = array(
+      '#type' => 'select',
+      '#required' => TRUE,
+      '#title' => t('Content Type'),
+      '#options' => node_type_get_names(),
+      '#default_value' => $contenttype,
+      '#description' => t('Select the content type that videos should import to'),
+    );
+  $form['playlistid4'] = array(
+    '#type' => 'textfield',
+    '#title' => t('YouTube play list ID.'),
+    '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+    '#default_value' => $playlistid,
+  );
+  $form['contenttype4'] = array(
+      '#type' => 'select',
+      '#required' => TRUE,
+      '#title' => t('Content Type'),
+      '#options' => node_type_get_names(),
+      '#default_value' => $contenttype,
+      '#description' => t('Select the content type that videos should import to'),
+  );
+  // $form['playlistid5'] = array(
+  //   '#type' => 'textfield',
+  //   '#title' => t('YouTube play list ID.'),
+  //   '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+  //   '#default_value' => $playlistid,
+  // );
+  // $form['playlistid6'] = array(
+  //   '#type' => 'textfield',
+  //   '#title' => t('YouTube play list ID.'),
+  //   '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+  //   '#default_value' => $playlistid,
+  // );
+  // $form['playlistid7'] = array(
+  //   '#type' => 'textfield',
+  //   '#title' => t('YouTube play list ID.'),
+  //   '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+  //   '#default_value' => $playlistid,
+  // );
+  // $form['playlistid8'] = array(
+  //   '#type' => 'textfield',
+  //   '#title' => t('YouTube play list ID.'),
+  //   '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+  //   '#default_value' => $playlistid,
+  // );
+  // $form['playlistid9'] = array(
+  //   '#type' => 'textfield',
+  //   '#title' => t('YouTube play list ID.'),
+  //   '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+  //   '#default_value' => $playlistid,
+  // );
 
   // Create the fequency setting.
   $form['frequency'] = array(
@@ -67,15 +164,6 @@ function youtube_import_form($form, &$form_state) {
     '#default_value' => $frequency,
   );
 
-  // Create the content type drop down.
-  $form['contenttype'] = array(
-    '#type' => 'select',
-    '#required' => TRUE,
-    '#title' => t('Content Type'),
-    '#options' => node_type_get_names(),
-    '#default_value' => $contenttype,
-    '#description' => t('Select the content type that videos should import to'),
-  );
 
   // Get the usernames from the Drupal database.
   $user_data = db_query("SELECT uid,name FROM {users} WHERE status=1");
