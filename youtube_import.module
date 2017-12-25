@@ -604,6 +604,12 @@ function youtube_import_get($key = NULL, $value = NULL)
         'mapping' => array(),
     );
 
+    for ($i = 1; $i < 6; $i++) {
+        $setting_keys['playlistid' . $i] = '';
+        $setting_keys['contenttype' . $i] = '';
+
+    }
+
     // Get everything from the database.
     $results = db_query("SELECT id,name,value,ismap FROM {youtube_import_settings}");
 

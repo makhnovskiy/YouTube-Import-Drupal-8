@@ -78,13 +78,31 @@ class youtube_import_form extends ConfigFormBase
             '#default_value' => isset($savedConfig['username']) ? $savedConfig['username'] : $config->get('username'),
         );
 
-        // Create the field for the playlist id.
-        $form['playlistid'] = array(
-            '#type' => 'textfield',
-            '#title' => t('YouTube play list ID.'),
-            '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
-            '#default_value' => isset($savedConfig['playlistid']) ? $savedConfig['playlistid'] : $config->get('playlistid'),
-        );
+        for($i = 1; $i < 6; $i++ ){
+            // Create the field for the playlist id.
+            $form['group']['playlistid' . $i] = array(
+                '#type' => 'textfield',
+                '#title' => t($i . ': YouTube play list ID.'),
+                '#description' => t('You may leave this blank if you have entered the YouTube username and it will be automatically updated to the "uploads" playlist of that user.'),
+                '#default_value' => isset($savedConfig['playlistid' . $i]) ? $savedConfig['playlistid' . $i] : $config->get('playlistid' . $i),
+            );
+
+            // Create the content type drop down.
+            $form['group']['contenttype' . $i] = array(
+                '#type' => 'select',
+                '#required' => TRUE,
+                '#title' => t($i . ': Content Type'),
+                '#options' => node_type_get_names(),
+                '#default_value' => isset($savedConfig['contenttype']) ? $savedConfig['contenttype'] : $config->get('contenttype'),
+                '#description' => t('Select the content type that videos should import to'),
+                '#attributes' => array('class' => array('ct-rgt')),
+            );
+        }
+
+
+
+
+
 
         // Create the fequency setting.
         $form['frequency'] = array(
@@ -95,15 +113,8 @@ class youtube_import_form extends ConfigFormBase
             '#default_value' => isset($savedConfig['frequency']) ? $savedConfig['frequency'] : $config->get('frequency'),
         );
 
-        // Create the content type drop down.
-        $form['contenttype'] = array(
-            '#type' => 'select',
-            '#required' => TRUE,
-            '#title' => t('Content Type'),
-            '#options' => node_type_get_names(),
-            '#default_value' => isset($savedConfig['contenttype']) ? $savedConfig['contenttype'] : $config->get('contenttype'),
-            '#description' => t('Select the content type that videos should import to'),
-        );
+
+
 
         // Get the usernames from the Drupal database.
 

@@ -11,15 +11,39 @@ youtube_import.settings:
     username:
       type: text
       label: 'YouTube Username'
-    playlistid:
+    playlistid1:
       type: text
       label: 'YouTube playlist ID'
+    playlistid2:
+          type: text
+          label: 'YouTube playlist ID'
+    playlistid3:
+          type: text
+          label: 'YouTube playlist ID'
+    playlistid4:
+          type: text
+          label: 'YouTube playlist ID'
+    playlistid5:
+              type: text
+              label: 'YouTube playlist ID'
     frequency:
       type: text
       label: 'frequency the import cron should run?'
-    contenttype:
+    contenttype1:
       type: text
       label: 'Content type to publish videos on'
+    contenttype2:
+          type: text
+          label: 'Content type to publish videos on'
+    contenttype3:
+          type: text
+          label: 'Content type to publish videos on'
+    contenttype4:
+          type: text
+          label: 'Content type to publish videos on'
+    contenttype5:
+          type: text
+          label: 'Content type to publish videos on'
     lastrun:
       type: text
       label: 'Last time that the import has run'
