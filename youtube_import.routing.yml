@@ -15,7 +15,7 @@ youtube_import.run_now:
     _permission: 'administer youtube_import module'
 help.page.youtube_import:
   path: '/admin/help/youtube_import'
-    defaults:
-      _title: 'Youtube Import'
-      _title_context: 'Setup Page.'
-      _controller: '\Drupal\youtube_import\Controller\youtube_import_run::hook_help'
+  defaults:
+    _title: 'Youtube Import'
+    _title_context: 'Setup Page.'
+    _controller: '\Drupal\youtube_import\Controller\youtube_import_run::hook_help'
